@@ -1,0 +1,23 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+
+# Local virtualenvs
+.venv/
+venv/
+
+# Notebooks and large local artifacts
+*.ipynb
+
+# Data exports (avoid committing large/raw datasets)
+Major_Crime_Indicators.csv
+Festivals and events json feed.json
+data/processed/
+
+# GTFS: keep only stops.txt (others can be large)
+Complete GTFS/*
+!Complete GTFS/stops.txt
+
+# Streamlit local state
+.streamlit/secrets.toml
