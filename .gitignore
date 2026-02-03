@@ -21,3 +21,7 @@ Complete GTFS/*
 
 # Streamlit local state
 .streamlit/secrets.toml
+
+# Large data files
+Complete GTFS/stop_times.txt
+Major_Crime_Indicators.csv

@@ -249,8 +249,6 @@ def make_map(
     event_daily_avg_lookup: dict[str, float] | None = None,
     normal_daily_avg_lookup: dict[str, float] | None = None,
     majority_type_lookup: dict[str, str] | None = None,
-    trend_color_lookup: dict[str, str] | None = None,
-    trend_text_lookup: dict[str, str] | None = None,
 ) -> folium.Map:
     # Base map centered on downtown Toronto
     m = folium.Map(location=[43.6532, -79.3832], zoom_start=12, tiles="CartoDB positron")
@@ -312,12 +310,6 @@ def make_map(
                 normal_avg = normal_daily_avg_lookup.get(str(stop_id)) or normal_daily_avg_lookup.get(stop_id)
             if majority_type_lookup:
                 maj_type = majority_type_lookup.get(str(stop_id)) or majority_type_lookup.get(stop_id)
-            trend_color = None
-            trend_text = None
-            if trend_color_lookup:
-                trend_color = trend_color_lookup.get(str(stop_id)) or trend_color_lookup.get(stop_id)
-            if trend_text_lookup:
-                trend_text = trend_text_lookup.get(str(stop_id)) or trend_text_lookup.get(stop_id)
             popup_html_parts = [
                 f"<b>{row.stop_name}</b><br>",
                 f"<span style='color:#666'>Stop ID:</span> {stop_id}<br>",
@@ -338,8 +330,6 @@ def make_map(
                 popup_html_parts.append(f"<br><span style='color:#666'>Risk level:</span> {level}")
             if maj_type is not None:
                 popup_html_parts.append(f"<br><span style='color:#666'>Top crime type:</span> {maj_type}")
-            if trend_text is not None:
-                popup_html_parts.append(f"<br><span style='color:#666'>Rolling trend:</span><br>{trend_text}")
 
             folium.RegularPolygonMarker(
                 location=[row.stop_lat, row.stop_lon],
@@ -350,16 +340,6 @@ def make_map(
                 fill_opacity=0.9,
                 popup=folium.Popup(html="".join(popup_html_parts), max_width=260),
             ).add_to(layer)
-            if trend_color:
-                folium.CircleMarker(
-                    location=[row.stop_lat, row.stop_lon],
-                    radius=4.5,
-                    color=trend_color,
-                    fill=True,
-                    fill_color=trend_color,
-                    fill_opacity=0.85,
-                    weight=2,
-                ).add_to(layer)
 
         # Individual crimes for this period
         for _, row in grp.iterrows():
@@ -410,28 +390,6 @@ def make_map(
         </div>
         """
         m.get_root().html.add_child(folium.Element(legend_html))
-
-    if trend_color_lookup:
-        trend_legend_html = """
-        <div style="
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: white;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 6px rgba(0,0,0,0.25);
-            font-size: 12px;
-            line-height: 1.4;
-        ">
-          <b>Rolling trend</b><br>
-          <i style="background:#e65100; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>HIGH (> 1.15x)<br>
-          <i style="background:#fdd835; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>STABLE (0.9-1.15x)<br>
-          <i style="background:#43a047; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>DECREASING (< 0.9x)<br>
-        </div>
-        """
-        m.get_root().html.add_child(folium.Element(trend_legend_html))
 
     return m
 
